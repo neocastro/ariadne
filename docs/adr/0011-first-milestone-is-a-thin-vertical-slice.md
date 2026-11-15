@@ -15,3 +15,7 @@ One program (a rate-limited API with per-request machines, a limiter, timers and
 ## Consequences
 
 Breadth before depth; each layer is minimal and will be revisited. The demo shows bugs found and fixed with no human reading code.
+
+## Amendments
+
+- ADR-0012 revises this milestone's scope and ticket order.

@@ -1,6 +1,6 @@
 # ADR-0003: Go-sized syntax, ML-strength semantics, core-first
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-11-15  
 **Deciders:** Yuri
 
@@ -18,7 +18,7 @@ The language desugars to a small, adopted core calculus (call-by-value lambda ca
 | --- | --- |
 | Go-style: small syntax, loose semantics | Easy to read; complexity pushed into every program |
 | Haskell/Rust-style: rich features | Expressive; large semantic surface, hard interactions |
-| **Small syntax, small strong core (proposed)** | Provable and predictable; fewer abstraction features |
+| **Small syntax, small strong core (chosen)** | Provable and predictable; fewer abstraction features |
 
 ## Consequences
 

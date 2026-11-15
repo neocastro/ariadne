@@ -23,3 +23,7 @@ Fix now: strict evaluation, no cyclic data, linear resource handles, linear mach
 ## Consequences
 
 The Lean soundness proof covers the memory constraints from the start; "no GC, no leaks" is real on the demo program.
+
+## Amendments
+
+- ADR-0012: the Lean proof is staged (pure core first, machines and linearity later) rather than covering the memory constraints from the start.

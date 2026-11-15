@@ -23,3 +23,8 @@ Each step runs to completion. Machines talk over typed asynchronous channels who
 ## Consequences
 
 Faults in simulation match reality as declared. Open: optional synchronous groups for control and numerical code.
+
+## Amendments
+
+- ADR-0010: protocols are declared finite automata that index the linear channel endpoint; "session types" here means that.
+- ADR-0012: protocol automata are built off the first milestone's critical path.
