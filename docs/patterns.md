@@ -6,9 +6,9 @@ Reliability patterns Ariadne intends to own, so they stop being conventions. Rec
 
 | Pattern | How the language could own it | Where | Notes |
 | --- | --- | --- | --- |
-| Transactional outbox, exactly-once effects | A step returns state and outputs together, so the runtime persists both atomically | Runtime | ADR-0013 (proposed) |
-| Backpressure and load shedding | Bounded mailboxes; the overflow policy (block, drop, reject with reply) is part of the channel type | Types | ADR-0014 (proposed) |
-| Idempotency and safe retries | An at-least-once channel requires an idempotent handler or a dedup key; retry is only allowed on idempotent operations | Types | ADR-0015 (proposed) |
+| Transactional outbox, exactly-once effects | A step returns state and outputs together, so the runtime persists both atomically | Runtime | ADR-0013 (accepted) |
+| Backpressure and load shedding | Bounded mailboxes; the overflow policy (block, drop, reject with reply) is part of the channel type | Types | ADR-0014 (accepted) |
+| Idempotency and safe retries | An at-least-once channel requires an idempotent handler or a dedup key; retry is only allowed on idempotent operations | Types | ADR-0015 (accepted) |
 | Sagas and compensation | A compensable action returns a linear obligation that must be committed or compensated | Types (linear) | Builds on ticket 17 |
 | Deadline propagation | Every request carries a deadline that children inherit; mandatory timeouts derive from it | Types | Builds on ticket 09 |
 | Supervision | A child's failure is an event to its parent; restart policy is declared | Machines | Erlang-style |

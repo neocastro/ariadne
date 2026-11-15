@@ -1,6 +1,6 @@
 # ADR-0014: Backpressure: bounded mailboxes, overflow policy in the channel type
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-11-15  
 **Deciders:** Yuri
 
@@ -40,7 +40,7 @@ Chan ⟨cap 64, lossy, dropOldest⟩ Msg  -- the oldest queued message is discar
 - Code gets more verbose (acceptable per ADR-0002): every reliable send has an overload path.
 - Capacity numbers become part of interfaces and need tuning; simulation and metrics must make them observable.
 
-## Control events and reserved capacity (proposed rule)
+## Control events and reserved capacity
 
 `Rejected` events, timer firings and peer-loss notices are control events. They must always be deliverable, or a full mailbox could hide its own overload.
 

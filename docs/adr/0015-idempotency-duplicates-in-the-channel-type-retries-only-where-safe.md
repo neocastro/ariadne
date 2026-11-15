@@ -1,6 +1,6 @@
 # ADR-0015: Idempotency: duplicates in the channel type, retries only where safe
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-11-15  
 **Deciders:** Yuri
 
@@ -13,7 +13,7 @@ Outputs are dispatched at least once (ADR-0013), and a sender that times out can
 - **Possible duplication is a delivery tag.** Alongside `lossy` and `unordered`, a channel may be tagged `duplicates`. A channel without that tag never delivers the same message ID twice; across a network the runtime implements this as at-least-once delivery plus deduplication.
 - **A receiver on a `duplicates` channel must be safe against duplicates**, in one of two declared ways:
   - **`idempotent` handler:** the handler for that event is declared idempotent, meaning that handling the same message twice leaves the same state and has no further observable effect.
-  - **`dedup` window:** the channel declares a deduplication window (a count or a time). The runtime keeps seen message IDs in the receiver's durable state and discards repeats.
+  - **`dedup` window:** the channel declares a deduplication window, as a count of message IDs. The runtime keeps seen message IDs in the receiver's durable state and discards repeats.
 - **`idempotent` requires a proof.** The obligation, for the handler of event `e`: handling `e` a second time changes nothing.
 
 ```
@@ -55,4 +55,4 @@ Chan ⟨cap 16, lossy, duplicates, dedup 1024, reject⟩ Charge
 
 - Decided 2026-11-15: a simulation check is not enough; `idempotent` requires a proof.
 - How much of real handler code falls inside the automatic route, and how the self-composed obligation is reported back as a counterexample.
-- Should the dedup window be a count, a time, or both?
+- Decided 2026-11-15: the dedup window is a count of message IDs for now; a time-based window can be added later.

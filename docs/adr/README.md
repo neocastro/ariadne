@@ -16,6 +16,6 @@ One file per decision. Accepted means decided; Proposed means recommended, await
 | [0010](0010-one-refinement-mechanism-in-a-decidable-fragment.md) | One refinement mechanism in a decidable fragment; Lean as the escape hatch | Accepted |
 | [0011](0011-first-milestone-is-a-thin-vertical-slice.md) | First milestone is a thin vertical slice | Accepted |
 | [0012](0012-milestone-1-scope-revised-after-review.md) | Milestone 1 scope revised after adversarial review | Accepted |
-| [0013](0013-atomic-step-commit-the-outbox-is-the-runtime.md) | Atomic step commit: the outbox is the runtime | Proposed |
-| [0014](0014-backpressure-bounded-mailboxes-overflow-policy-in-the-channel-type.md) | Backpressure: bounded mailboxes, overflow policy in the channel type | Proposed |
-| [0015](0015-idempotency-duplicates-in-the-channel-type-retries-only-where-safe.md) | Idempotency: duplicates in the channel type, retries only where safe | Proposed |
+| [0013](0013-atomic-step-commit-the-outbox-is-the-runtime.md) | Atomic step commit: the outbox is the runtime | Accepted |
+| [0014](0014-backpressure-bounded-mailboxes-overflow-policy-in-the-channel-type.md) | Backpressure: bounded mailboxes, overflow policy in the channel type | Accepted |
+| [0015](0015-idempotency-duplicates-in-the-channel-type-retries-only-where-safe.md) | Idempotency: duplicates in the channel type, retries only where safe | Accepted |

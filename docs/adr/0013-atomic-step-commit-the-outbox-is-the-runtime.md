@@ -1,6 +1,6 @@
 # ADR-0013: Atomic step commit: the outbox is the runtime
 
-**Status:** Proposed  
+**Status:** Accepted  
 **Date:** 2026-11-15  
 **Deciders:** Yuri
 
@@ -48,9 +48,9 @@ An ephemeral machine can vanish with everything it holds. Each guarantee needs a
 
 Mandatory timeouts (ADR-0008), "check one representative machine" (ADR-0005) and simulation are unaffected; simulation gains a crash fault that loses ephemeral state and recovers durable state.
 
-Proposed direction, not yet decided: there is no default. Every machine declares `durable` or `ephemeral` (ADR-0002), and the checker rejects `ephemeral` wherever the rules above are not met.
+Agreed direction (2026-11-15): there is no default. Every machine declares `durable` or `ephemeral` (ADR-0002), and the checker rejects `ephemeral` wherever the rules above are not met.
 
 ## Open questions
 
 - The storage interface: what the runtime requires from a log store.
-- Whether to adopt the "no default, checker-enforced" direction above. Nothing in milestone 1 depends on it: the log is in memory and every machine behaves the same way.
+- The precise checker rules for `ephemeral`, to be written when the storage interface is designed. Nothing in milestone 1 depends on them: the log is in memory and every machine behaves the same way.

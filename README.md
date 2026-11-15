@@ -14,6 +14,7 @@ Agents write the code; humans review specs, machines and compiler-generated view
 - [Decisions (ADRs)](docs/adr/README.md)
 - [Design notes](docs/design.md)
 - [Systems design patterns backlog](docs/patterns.md)
+- [Open questions](docs/open-questions.md)
 - First milestone tickets: GitHub issues labelled `milestone-1`
 
 ## Status
