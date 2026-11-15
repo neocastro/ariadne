@@ -33,7 +33,24 @@ A step returns its next state and its outputs together (`step ∷ s ⊸ i → (s
 - A durable step costs a storage write. Batching several machines' commits is a runtime optimization that must preserve per-machine atomicity.
 - Milestone 1 keeps the log in memory but uses the same commit-then-dispatch semantics and message IDs, so nothing changes shape later.
 
+## How `ephemeral` interacts with the other guarantees
+
+An ephemeral machine can vanish with everything it holds. Each guarantee needs a rule for that:
+
+| Guarantee | What a vanishing machine breaks | Rule that restores it |
+| --- | --- | --- |
+| Linear values (ADR-0006, ADR-0010) | Handles and obligations it held are dropped, never used | Loss is an event to the durable parent, which holds or re-acquires the resource; an ephemeral machine may not be the sole owner of a saga obligation |
+| Delivery guarantees (ADR-0009) | A message it consumed but did not finish is lost, so delivery to it is at most once | A channel into an ephemeral machine must be tagged `lossy`, or the sender must handle a `PeerLost` event |
+| Deduplication (ADR-0015) | Its dedup window is gone | A `duplicates` channel into an ephemeral machine needs a proved `idempotent` handler |
+| Protocol typestate (ADR-0010) | The peer is stuck mid-protocol | Every protocol state has a `PeerLost` transition when the peer is ephemeral |
+| Atomic outputs (this ADR) | It may crash after sending only some of a step's outputs | Receivers of an ephemeral machine's outputs see a prefix; the type of its channels says so |
+| Replay and post-mortem | No log to replay | Tracing is optional and best-effort for ephemeral machines |
+
+Mandatory timeouts (ADR-0008), "check one representative machine" (ADR-0005) and simulation are unaffected; simulation gains a crash fault that loses ephemeral state and recovers durable state.
+
+Proposed direction, not yet decided: there is no default. Every machine declares `durable` or `ephemeral` (ADR-0002), and the checker rejects `ephemeral` wherever the rules above are not met.
+
 ## Open questions
 
 - The storage interface: what the runtime requires from a log store.
-- Whether per-request machines default to `ephemeral`.
+- Whether to adopt the "no default, checker-enforced" direction above. Nothing in milestone 1 depends on it: the log is in memory and every machine behaves the same way.

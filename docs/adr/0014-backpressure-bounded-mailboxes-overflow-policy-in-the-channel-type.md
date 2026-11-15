@@ -40,7 +40,21 @@ Chan ⟨cap 64, lossy, dropOldest⟩ Msg  -- the oldest queued message is discar
 - Code gets more verbose (acceptable per ADR-0002): every reliable send has an overload path.
 - Capacity numbers become part of interfaces and need tuning; simulation and metrics must make them observable.
 
+## Control events and reserved capacity (proposed rule)
+
+`Rejected` events, timer firings and peer-loss notices are control events. They must always be deliverable, or a full mailbox could hide its own overload.
+
+- **A separate control queue.** Each machine has a control queue next to its mailbox. Control events never compete with ordinary messages for capacity, and are handled first.
+- **Its size is derived, not chosen.** The control queue holds one slot per thing that can produce a control event: each outstanding send on a `reject` channel, each live timer, each peer.
+- **Outstanding sends are bounded by types.**
+  - On a channel with a protocol automaton (ADR-0010), an endpoint that has sent a request is in an awaiting state and cannot send again, so each endpoint contributes exactly one slot.
+  - On a one-way `reject` channel, the type carries a `window k`: at most `k` sends may be unresolved, and the checker proves the bound from an index in the machine's state.
+- **Live timers are bounded by a declared maximum per machine.**
+- **A control event is never answered with a control event.** Handling one may emit ordinary sends, which cannot block, so no cycle of waiting can form.
+
+Prior art this follows: Akka's control-aware mailboxes keep a second queue for control messages; interconnection networks guarantee progress with reserved escape buffers (Duato's escape channels, bubble flow control); Gay and Vasconcelos prove that a session type bounds the buffer a channel needs, which is what lets the reserved size be derived from protocol automata. Pony takes the other road, slowing senders through the scheduler instead of rejecting; that stays available as a runtime optimization inside one process but cannot cross a network.
+
 ## Open questions
 
-- Delivery of `Rejected` events and timer firings must not itself be rejectable. Proposed: reserved capacity, bounded by the machine's outstanding sends and timers. Needs a precise rule.
+- How the `window k` bound on one-way channels is released: an explicit acceptance event, or credits passed into the step.
 - Whether capacity is a literal or may be an index refined elsewhere.
