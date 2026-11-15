@@ -24,3 +24,4 @@ One file per decision. Accepted means decided; Proposed means recommended, await
 | [0018](0018-machine-combinators-are-fused-and-lawful-no-loop.md) | Machine combinators are fused and lawful; `loop` is removed | Accepted |
 | [0019](0019-storage-contract-append-only-log-and-snapshots.md) | Storage contract: an append-only log per machine, plus snapshots | Accepted |
 | [0020](0020-transition-headers-names-declared-outputs-wildcard-drop.md) | Transition headers: names, declared outputs, and a wildcard for `drop` | Accepted |
+| [0021](0021-no-reliable-one-way-channels.md) | No reliable one-way channels | Accepted |

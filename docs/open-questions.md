@@ -4,7 +4,6 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 
 | # | Question | Needed before |
 | --- | --- | --- |
-| 5 | How is a one-way channel's send window released: an acceptance event, or credits passed into the step? | One-way `reject` channels |
 | 6 | How do Lean proofs attach to Ariadne code, and who maintains the core-to-Lean export? | The Lean escape hatch being usable |
 | 7 | Who writes the proofs that are not automatic: the model or a human? | The proof route for `idempotent` and other Lean obligations |
 | 8 | Row-polymorphic records: add them? | Generic schema code |
@@ -26,6 +25,7 @@ To measure rather than decide: how much real handler code falls inside the autom
 - 2. Multi-shot effect handlers: no longer arises (ADR-0016).
 - 16. Liveness: deadlines with declared fault and scheduling budgets; true "eventually" deferred to finite models (ADR-0017).
 - 17. Reference machines: used alongside "never" monitors, run as monitors, human-approved, optional per system (ADR-0017).
+- 5. One-way channel send window: removed; one-way channels are always lossy, and `reject` needs a protocol (ADR-0021).
 - 4. Storage contract: an append-only log per machine plus snapshots; a purpose-built engine possibly later (ADR-0019).
 - 3. Spec layer: specs are written in Ariadne; invariants by default, native exploration as the fallback (ADR-0017).
 - What success looks like for the first milestone: ADR-0011, ADR-0012.
