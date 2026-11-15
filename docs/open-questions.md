@@ -4,7 +4,7 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 
 | # | Question | Needed before |
 | --- | --- | --- |
-| 6 | How do Lean proofs attach to Ariadne code, and who maintains the core-to-Lean export? | The Lean escape hatch being usable |
+| 6 | How do Lean proofs attach to Ariadne code? **Deferred on 2026-11-15**; nothing in milestone 1 needs it. Options on the table: export code as terms of the mechanized core (deep embedding, smallest trusted base, laborious proofs); translate to native Lean functions (easy proofs, translator is trusted); both, linked by an agreement theorem. The export is part of the compiler in this repository under any option. | The Lean escape hatch being usable |
 | 7 | Who writes the proofs that are not automatic: the model or a human? | The proof route for `idempotent` and other Lean obligations |
 | 8 | Row-polymorphic records: add them? | Generic schema code |
 | 9 | A sort for nonlinear arithmetic or units of measure? | Numerical code |
