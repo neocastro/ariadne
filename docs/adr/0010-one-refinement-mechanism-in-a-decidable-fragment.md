@@ -64,6 +64,6 @@ recv ∷ Chan P s ⊸ ∃s'. {step P s s'} (Msg s s', Chan P s')
 ## Open questions
 
 - Are multi-shot effect handlers needed at all? If so, linear values cannot cross effect operations.
-- Are row-polymorphic records worth adding, given effect rows already exist?
+- Row-polymorphic records: decided on 2026-11-15 not to add them. Effect rows no longer exist (ADR-0016), so there is no machinery to reuse; records stay nominal. Revisit on evidence.
 - Who maintains the core-to-Lean export, and when does the Lean escape hatch become usable in practice?
 - Which nonlinear cases (rates, matrix dimensions) matter enough to need a dedicated sort?

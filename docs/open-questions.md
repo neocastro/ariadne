@@ -5,8 +5,7 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 | # | Question | Needed before |
 | --- | --- | --- |
 | 6 | How do Lean proofs attach to Ariadne code? **Deferred on 2026-11-15**; nothing in milestone 1 needs it. Options on the table: export code as terms of the mechanized core (deep embedding, smallest trusted base, laborious proofs); translate to native Lean functions (easy proofs, translator is trusted); both, linked by an agreement theorem. The export is part of the compiler in this repository under any option. | The Lean escape hatch being usable |
-| 7 | Who writes the proofs that are not automatic: the model or a human? | The proof route for `idempotent` and other Lean obligations |
-| 8 | Row-polymorphic records: add them? | Generic schema code |
+| 7 | Who writes the proofs that are not automatic: the model or a human? **Deferred on 2026-11-15** together with question 6, which it depends on. | The proof route for `idempotent` and other Lean obligations |
 | 9 | A sort for nonlinear arithmetic or units of measure? | Numerical code |
 | 10 | Should `await` exist as optional sugar? | No deadline |
 | 11 | Optional synchronous groups of machines? | Control and numerical code |
@@ -15,7 +14,7 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 | 14 | Patterns backlog: sagas, deadline propagation, supervision, schema evolution, staleness and fencing, determinism boundaries | Each feature |
 | 15 | Standard-library machines beyond `lift`, `>>>` and `|||` (retry, scatter-gather, routing): which ones, and how are they typed? The core combinators and their laws are settled by ADR-0018. | The standard library |
 | 18 | System-wide properties over all replicas: quantified invariants, or composition from per-machine invariants and channel contracts? | Properties spanning many machines |
-| 19 | Recognized machine kinds for further unbounded guarantees: replicated, monotone, topology restrictions, deterministic pipeline regions | Each kind |
+| 19 | Recognized machine kinds for further unbounded guarantees: replicated, monotone, topology restrictions, deterministic pipeline regions Note: for replicated machines, the header skeleton with one token per machine instance is a Petri net, so safety for any number of instances is a coverability question, and linear place invariants are candidate inductive invariants in the solver's fragment. | Each kind |
 
 To measure rather than decide: how much real handler code falls inside the automatic idempotence proof (ADR-0015).
 
@@ -25,6 +24,7 @@ To measure rather than decide: how much real handler code falls inside the autom
 - 2. Multi-shot effect handlers: no longer arises (ADR-0016).
 - 16. Liveness: deadlines with declared fault and scheduling budgets; true "eventually" deferred to finite models (ADR-0017).
 - 17. Reference machines: used alongside "never" monitors, run as monitors, human-approved, optional per system (ADR-0017).
+- 8. Row-polymorphic records: not adding. Records stay nominal and generic schema code comes from build-time generation (ADR-0010). Revisit on evidence from real programs.
 - 5. One-way channel send window: removed; one-way channels are always lossy, and `reject` needs a protocol (ADR-0021).
 - 4. Storage contract: an append-only log per machine plus snapshots; a purpose-built engine possibly later (ADR-0019).
 - 3. Spec layer: specs are written in Ariadne; invariants by default, native exploration as the fallback (ADR-0017).
