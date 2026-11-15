@@ -70,8 +70,11 @@ inv ∷ s → Bool
 - The solver and the runtime are the trusted base for specs; no external model checker is in the toolchain.
 - Supersedes ADR-0004's sketch of spec machines as relations returning sets.
 
+## Decided afterwards (2026-11-15)
+
+- **Liveness is written as deadlines.** A liveness property is a deadline over logical time ("answered within T"), which makes it a safety property that monitors check in exploration, in simulation and in production. A deadline holds under declared assumptions: a fault budget (for example, at most k consecutive drops on a channel) and a scheduling bound (every ready machine runs within k steps). True "eventually" properties under fairness are deferred, and only for the finite header and protocol models checked by the deferred external model checker.
+- **Reference machines are used alongside "never" monitors.** A reference machine is a small machine describing a system's intended behaviour at its boundary. It runs as a monitor: it observes boundary events and tracks which abstract states remain possible; none remaining is a violation. It is written or approved by a human and is read-only to the agent. It is optional per system, not required.
+
 ## Open questions
 
-- Liveness: deadlines over logical time with explicit fault and scheduling budgets (proposed), or true "eventually" properties.
-- Whether reference machines, run as monitors over a system's boundary events and approved by a human, are used alongside "never" monitors (proposed).
 - Quantified invariants versus compositional reasoning for system-wide properties.

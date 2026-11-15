@@ -16,8 +16,6 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 | 13 | Constrained decoding: grammar only, or types too? | Tuning the agent loop |
 | 14 | Patterns backlog: sagas, deadline propagation, supervision, schema evolution, staleness and fencing, determinism boundaries | Each feature |
 | 15 | Machine combinators: which ones, and how are they typed? | The standard library |
-| 16 | Liveness: deadlines with explicit fault and scheduling budgets, or true "eventually" properties? | Liveness monitors |
-| 17 | Reference machines run as monitors, approved by a human: use them alongside "never" monitors? | Specs for whole systems |
 | 18 | System-wide properties over all replicas: quantified invariants, or composition from per-machine invariants and channel contracts? | Properties spanning many machines |
 | 19 | Recognized machine kinds for further unbounded guarantees: replicated, monotone, topology restrictions, deterministic pipeline regions | Each kind |
 
@@ -27,6 +25,8 @@ To measure rather than decide: how much real handler code falls inside the autom
 
 - 1. Effect types and capabilities: expressions are pure, machines are the only effect, channels are the capabilities (ADR-0016).
 - 2. Multi-shot effect handlers: no longer arises (ADR-0016).
+- 16. Liveness: deadlines with declared fault and scheduling budgets; true "eventually" deferred to finite models (ADR-0017).
+- 17. Reference machines: used alongside "never" monitors, run as monitors, human-approved, optional per system (ADR-0017).
 - 3. Spec layer: specs are written in Ariadne; invariants by default, native exploration as the fallback (ADR-0017).
 - What success looks like for the first milestone: ADR-0011, ADR-0012.
 - How far dependent types go, and which proof options go into the language: ADR-0010.
