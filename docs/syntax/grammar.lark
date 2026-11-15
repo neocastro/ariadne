@@ -1,0 +1,137 @@
+// Ariadne surface grammar, milestone-1 fragment. DRAFT for ticket #1.
+// LALR(1). Checked by docs/syntax/check_grammar.py.
+// Rules marked PROVISIONAL belong to later tickets and may change.
+
+start: module_decl import_decl* decl*
+
+module_decl: "module" path
+import_decl: "import" path
+path: LIDENT ("." LIDENT)*
+
+?decl: type_decl | fn_decl | machine_decl | monitor_decl
+
+// ---- types ----------------------------------------------------------------
+
+type_decl: "type" UIDENT type_params? "=" variant ("|" variant)*
+type_params: "[" LIDENT ("," LIDENT)* "]"
+
+// A constructor's fields are all positional or all named, never mixed.
+variant: UIDENT                               -> variant_nullary
+       | UIDENT "(" type ("," type)* ")"      -> variant_positional
+       | UIDENT "(" field ("," field)* ")"    -> variant_named
+field: LIDENT ":" type
+
+type: qname type_args?                              -> type_named
+    | LIDENT                                        -> type_var
+    | "fn" "(" [type ("," type)*] ")" "->" type     -> type_fn
+    | "(" type ("," type)+ ")"                      -> type_tuple
+    | "{" LIDENT ":" type "|" expr "}"              -> type_refined   // PROVISIONAL, ticket 18
+    | "Chan" "[" type ("," chan_tag)* "]"           -> type_chan      // PROVISIONAL, ticket 08
+type_args: "[" type ("," type)* "]"
+qname: UIDENT ("::" UIDENT)?
+
+chan_tag: "cap" INT        -> tag_cap
+        | "reject"         -> tag_reject
+        | "lossy"          -> tag_lossy
+        | "unordered"      -> tag_unordered
+        | "duplicates"     -> tag_duplicates
+        | "dedup" INT      -> tag_dedup
+        | "drop_newest"    -> tag_drop_newest
+        | "drop_oldest"    -> tag_drop_oldest
+        | "window" INT     -> tag_window
+
+// ---- functions and expressions --------------------------------------------
+
+fn_decl: "fn" LIDENT type_params? "(" [param ("," param)*] ")" "->" type block
+param: LIDENT ":" type
+
+block: "{" let_stmt* expr "}"
+let_stmt: "let" pattern [":" type] "=" expr ";"
+
+?expr: next_expr | or_expr
+next_expr: "next" postfix "emit" or_expr
+
+?or_expr: and_expr | or_expr "||" and_expr     -> or_
+?and_expr: cmp_expr | and_expr "&&" cmp_expr   -> and_
+?cmp_expr: add_expr | add_expr CMP add_expr    -> cmp
+?add_expr: mul_expr | add_expr ADD mul_expr    -> add
+?mul_expr: unary | mul_expr MUL unary          -> mul
+?unary: postfix | "!" unary -> not_ | "-" unary -> neg
+?postfix: primary
+        | postfix "." LIDENT                   -> field_access
+        | postfix "(" [args] ")"               -> call
+?args: expr ("," expr)*                        -> args_positional
+     | named_arg ("," named_arg)*              -> args_named
+named_arg: LIDENT ":" expr
+
+?primary: INT                                  -> int
+        | STRING                               -> string
+        | LIDENT                               -> var
+        | qname                                -> constructor
+        | "(" expr ")"
+        | "(" expr ("," expr)+ ")"             -> tuple
+        | "[" [expr ("," expr)*] "]"           -> list
+        | if_expr
+        | match_expr
+        | lambda
+
+if_expr: "if" expr block "else" (block | if_expr)
+match_expr: "match" expr "{" arm+ "}"
+arm: pattern "=>" expr ","
+lambda: "fn" "(" [LIDENT ("," LIDENT)*] ")" block
+
+?pattern: "_"                                          -> pat_wild
+        | LIDENT                                       -> pat_var
+        | INT                                          -> pat_int
+        | STRING                                       -> pat_string
+        | qname                                        -> pat_nullary
+        | qname "(" pattern ("," pattern)* ")"         -> pat_positional
+        | qname "(" field_pat ("," field_pat)* ")"     -> pat_named
+        | "(" pattern ("," pattern)+ ")"               -> pat_tuple
+field_pat: LIDENT ":" pattern
+
+// ---- machines --------------------------------------------------------------
+
+machine_decl: "machine" UIDENT "{" machine_item* "}"
+monitor_decl: "monitor" UIDENT "{" machine_item* "}"       // PROVISIONAL, ticket 10
+
+?machine_item: config_decl
+             | state_decl
+             | event_decl
+             | timer_decl
+             | observes_decl
+             | transitions_decl
+             | invariant_decl
+             | init_decl
+             | step_decl
+
+config_decl: "config" "(" field ("," field)* ")"
+state_decl: "state" variant state_attr*
+state_attr: "waiting"      -> attr_waiting                 // PROVISIONAL, ticket 09
+          | "violation"    -> attr_violation               // PROVISIONAL, ticket 10
+event_decl: "event" variant
+timer_decl: "timer" UIDENT                                 // PROVISIONAL, ticket 09
+observes_decl: "observes" qname ("," qname)*               // PROVISIONAL, ticket 10
+
+transitions_decl: "transitions" "{" transition* "}"
+transition: UIDENT "on" qname "->" target ("|" target)*
+target: UIDENT -> target_state | "drop" -> target_drop
+
+invariant_decl: "invariant" "(" LIDENT ")" block           // PROVISIONAL, ticket 29
+init_decl: "init" "(" LIDENT "," LIDENT ")" block
+step_decl: "step" "(" LIDENT "," LIDENT "," LIDENT ")" block
+
+// ---- lexical ---------------------------------------------------------------
+
+LIDENT: /[a-z][a-zA-Z0-9_]*/
+UIDENT: /[A-Z][a-zA-Z0-9]*/
+INT: /[0-9]+/
+STRING: /"([^"\\\n]|\\.)*"/
+CMP: "==" | "!=" | "<=" | ">=" | "<" | ">"
+ADD: "+" | "-"
+MUL: "*" | "/" | "%"
+
+COMMENT: /\/\/[^\n]*/
+%import common.WS
+%ignore WS
+%ignore COMMENT
