@@ -1,0 +1,191 @@
+// The milestone-1 example system, sketched to stress the syntax.
+// Not checked for types or behaviour: only the grammar is verified.
+module examples.rate_limited_api
+
+type Decision = Admit | Deny
+type Lookup = Found(String) | Missing
+type Outcome = Served(String) | Limited | Unavailable
+
+// ---- limiter ---------------------------------------------------------------
+
+machine Limiter {
+  config(capacity: {n: Int | n > 0}, window: Time)
+
+  state Open(tokens: Int, capacity: Int, window: Time)
+  state Exhausted(capacity: Int, window: Time)
+
+  event Acquire(reply: Chan[Decision, cap 1, lossy, drop_newest])
+  timer WindowEnd
+
+  transitions {
+    Open on Acquire -> Open | Exhausted sends reply
+    Open on WindowEnd -> Open starts WindowEnd
+    Exhausted on Acquire -> Exhausted sends reply
+    Exhausted on WindowEnd -> Open starts WindowEnd
+  }
+
+  invariant(s) {
+    match s {
+      Open(tokens: t, capacity: c, window: _) => 0 < t && t <= c,
+      Exhausted(capacity: c, window: _) => 0 < c,
+    }
+  }
+
+  init(cfg, env) {
+    next Open(tokens: cfg.capacity, capacity: cfg.capacity, window: cfg.window)
+    emit [start_timer(WindowEnd, cfg.window)]
+  }
+
+  step(state, event, env) {
+    match (state, event) {
+      (Open(tokens: t, capacity: c, window: w), Acquire(reply: r)) =>
+        if t > 1 {
+          next Open(tokens: t - 1, capacity: c, window: w) emit [send(r, Admit)]
+        } else {
+          next Exhausted(capacity: c, window: w) emit [send(r, Admit)]
+        },
+      (Open(tokens: _, capacity: c, window: w), WindowEnd) =>
+        next Open(tokens: c, capacity: c, window: w) emit [start_timer(WindowEnd, w)],
+      (Exhausted(capacity: c, window: w), Acquire(reply: r)) =>
+        next Exhausted(capacity: c, window: w) emit [send(r, Deny)],
+      (Exhausted(capacity: c, window: w), WindowEnd) =>
+        next Open(tokens: c, capacity: c, window: w) emit [start_timer(WindowEnd, w)],
+    }
+  }
+}
+
+// ---- fake database -----------------------------------------------------------
+
+machine FakeDb {
+  config(value: String)
+
+  state Ready(value: String)
+
+  event Get(key: String, reply: Chan[Lookup, cap 1, lossy, drop_newest])
+
+  transitions {
+    Ready on Get -> Ready sends reply
+  }
+
+  invariant(s) {
+    True
+  }
+
+  init(cfg, env) {
+    next Ready(value: cfg.value) emit []
+  }
+
+  step(state, event, env) {
+    match (state, event) {
+      (Ready(value: v), Get(key: _, reply: r)) =>
+        next Ready(value: v) emit [send(r, Found(v))],
+    }
+  }
+}
+
+// ---- one machine per request -------------------------------------------------
+
+machine Request {
+  config(
+    key: String,
+    limiter: Chan[Limiter::Acquire, cap 64, reject],
+    db: Chan[FakeDb::Get, cap 64, reject],
+    client: Chan[Outcome, cap 1, lossy, drop_newest],
+    patience: Time
+  )
+
+  state AwaitLimiter(
+    key: String,
+    db: Chan[FakeDb::Get, cap 64, reject],
+    client: Chan[Outcome, cap 1, lossy, drop_newest]
+  ) waiting
+  state AwaitDb(client: Chan[Outcome, cap 1, lossy, drop_newest]) waiting
+  state Done
+
+  event Decided(Decision)
+  event Looked(Lookup)
+  event Rejected
+  timer GaveUp
+
+  transitions {
+    AwaitLimiter on Decided -> AwaitDb | Done sends db, client
+    AwaitLimiter on Rejected -> Done sends client
+    AwaitLimiter on GaveUp -> Done sends client
+    AwaitLimiter on _ -> drop
+    AwaitDb on Looked -> Done sends client
+    AwaitDb on Rejected -> Done sends client
+    AwaitDb on GaveUp -> Done sends client
+    AwaitDb on _ -> drop
+    Done on _ -> drop
+  }
+
+  invariant(s) {
+    True
+  }
+
+  init(cfg, env) {
+    next AwaitLimiter(key: cfg.key, db: cfg.db, client: cfg.client)
+    emit [
+      send(cfg.limiter, Limiter::Acquire(reply: env.inbox(Decided))),
+      start_timer(GaveUp, cfg.patience)
+    ]
+  }
+
+  step(state, event, env) {
+    match (state, event) {
+      (AwaitLimiter(key: k, db: d, client: c), Decided(Admit)) =>
+        next AwaitDb(client: c)
+        emit [send(d, FakeDb::Get(key: k, reply: env.inbox(Looked)))],
+      (AwaitLimiter(key: _, db: _, client: c), Decided(Deny)) =>
+        next Done emit [send(c, Limited)],
+      (AwaitLimiter(key: _, db: _, client: c), Rejected) =>
+        next Done emit [send(c, Unavailable)],
+      (AwaitLimiter(key: _, db: _, client: c), GaveUp) =>
+        next Done emit [send(c, Unavailable)],
+      (AwaitDb(client: c), Looked(Found(v))) =>
+        next Done emit [send(c, Served(v))],
+      (AwaitDb(client: c), Looked(Missing)) =>
+        next Done emit [send(c, Unavailable)],
+      (AwaitDb(client: c), Rejected) =>
+        next Done emit [send(c, Unavailable)],
+      (AwaitDb(client: c), GaveUp) =>
+        next Done emit [send(c, Unavailable)],
+    }
+  }
+}
+
+// ---- the spec, as a monitor --------------------------------------------------
+
+monitor AtMostCapacityPerWindow {
+  config(capacity: Int)
+
+  state Counting(admitted: Int, capacity: Int)
+  state Violated violation
+
+  observes Request::Decided, Limiter::WindowEnd
+
+  transitions {
+    Counting on Request::Decided -> Counting | Violated
+    Counting on Limiter::WindowEnd -> Counting
+    Violated on _ -> drop
+  }
+
+  init(cfg, env) {
+    next Counting(admitted: 0, capacity: cfg.capacity) emit []
+  }
+
+  step(state, event, env) {
+    match (state, event) {
+      (Counting(admitted: n, capacity: c), Request::Decided(Admit)) =>
+        if n + 1 > c {
+          next Violated emit []
+        } else {
+          next Counting(admitted: n + 1, capacity: c) emit []
+        },
+      (Counting(admitted: n, capacity: c), Request::Decided(Deny)) =>
+        next Counting(admitted: n, capacity: c) emit [],
+      (Counting(admitted: _, capacity: c), Limiter::WindowEnd) =>
+        next Counting(admitted: 0, capacity: c) emit [],
+    }
+  }
+}

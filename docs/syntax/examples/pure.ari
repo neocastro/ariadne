@@ -1,0 +1,60 @@
+// Pure fragment: types, functions, let, match, if, lambdas, lists, tuples.
+module examples.pure
+
+type Option[a] = None | Some(a)
+type Result[a, e] = Ok(a) | Err(e)
+type List[a] = Nil | Cons(a, List[a])
+type Point = Point(x: Int, y: Int)
+
+fn clamp(low: Int, high: Int, n: Int) -> Int {
+  if n < low { low } else if n > high { high } else { n }
+}
+
+fn length[a](xs: List[a]) -> Int {
+  match xs {
+    Nil => 0,
+    Cons(_, rest) => 1 + length(rest),
+  }
+}
+
+fn map[a, b](f: fn(a) -> b, xs: List[a]) -> List[b] {
+  match xs {
+    Nil => Nil,
+    Cons(x, rest) => Cons(f(x), map(f, rest)),
+  }
+}
+
+fn safe_div(n: Int, d: Int) -> Result[Int, String] {
+  if d == 0 { Err("division by zero") } else { Ok(n / d) }
+}
+
+fn manhattan(p: Point, q: Point) -> Int {
+  let dx = abs(p.x - q.x);
+  let dy = abs(p.y - q.y);
+  dx + dy
+}
+
+fn abs(n: Int) -> Int {
+  if n < 0 { -n } else { n }
+}
+
+fn shift(p: Point, by: Int) -> Point {
+  Point(x: p.x + by, y: p.y + by)
+}
+
+fn swap[a, b](pair: (a, b)) -> (b, a) {
+  let (first, second) = pair;
+  (second, first)
+}
+
+fn doubled(xs: List[Int]) -> List[Int] {
+  map(fn(n) { n * 2 }, xs)
+}
+
+fn describe(r: Result[Int, String]) -> String {
+  match r {
+    Ok(0) => "zero",
+    Ok(_) => "non-zero",
+    Err(message) => message,
+  }
+}
