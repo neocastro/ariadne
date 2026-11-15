@@ -1,22 +1,41 @@
 # Open questions
 
-Questions not yet settled by an ADR, in the order we plan to answer them. Each answer becomes an ADR or an amendment, and its entry moves to "Answered". Numbers are stable.
+Each open question is a GitHub issue labelled `decision`. The issue states why it matters, the options with their trade-offs, and a suggested pick. Answer by commenting with an option letter; the answer is then recorded as an ADR and the issue is closed. This file is the index.
 
-| # | Question | Needed before |
-| --- | --- | --- |
-| 6 | How do Lean proofs attach to Ariadne code? **Deferred on 2026-11-15**; nothing in milestone 1 needs it. Options on the table: export code as terms of the mechanized core (deep embedding, smallest trusted base, laborious proofs); translate to native Lean functions (easy proofs, translator is trusted); both, linked by an agreement theorem. The export is part of the compiler in this repository under any option. | The Lean escape hatch being usable |
-| 7 | Who writes the proofs that are not automatic: the model or a human? **Deferred on 2026-11-15** together with question 6, which it depends on. | The proof route for `idempotent` and other Lean obligations |
-| 9 | A sort for nonlinear arithmetic or units of measure? | Numerical code |
-| 10 | Should `await` exist as optional sugar? | No deadline |
-| 11 | Optional synchronous groups of machines? | Control and numerical code |
-| 12 | Compile targets: native, WebAssembly, or both? | The optimizing compiler |
-| 13 | Constrained decoding: grammar only, or types too? | Tuning the agent loop |
-| 14 | Patterns backlog: sagas, deadline propagation, supervision, schema evolution, staleness and fencing, determinism boundaries | Each feature |
-| 15 | Standard-library machines beyond `lift`, `>>>` and `|||` (retry, scatter-gather, routing): which ones, and how are they typed? The core combinators and their laws are settled by ADR-0018. | The standard library |
-| 18 | System-wide properties over all replicas: quantified invariants, or composition from per-machine invariants and channel contracts? | Properties spanning many machines |
-| 19 | Recognized machine kinds for further unbounded guarantees: replicated, monotone, topology restrictions, deterministic pipeline regions Note: for replicated machines, the header skeleton with one token per machine instance is a Petri net, so safety for any number of instances is a coverability question, and linear place invariants are candidate inductive invariants in the solver's fragment. | Each kind |
+Questions S1 to S6 came from the syntax draft (pull request #30). Numbers 6 to 19 are the original open questions; their numbers are stable.
+
+| # | Question | Issue | Blocks |
+| --- | --- | --- | --- |
+| S1 | How does a machine receive replies? | [#31](https://github.com/neocastro/ariadne/issues/31) | Blocks #8 |
+| S2 | How is the `Rejected` control event declared? | [#32](https://github.com/neocastro/ariadne/issues/32) | Blocks #8 |
+| S3 | How is a system wired together? | [#33](https://github.com/neocastro/ariadne/issues/33) | Blocks #8 and #12 |
+| S4 | What may a monitor observe? | [#34](https://github.com/neocastro/ariadne/issues/34) | Blocks #10 |
+| S5 | Should there be type aliases? | [#35](https://github.com/neocastro/ariadne/issues/35) | Nothing |
+| S6 | Should a state be updatable without rebuilding it field by field? | [#36](https://github.com/neocastro/ariadne/issues/36) | Nothing |
+| 9 | A sort for nonlinear arithmetic or units of measure? | [#37](https://github.com/neocastro/ariadne/issues/37) | Nothing in milestone 1 |
+| 10 | Should `await` exist as optional sugar? | [#38](https://github.com/neocastro/ariadne/issues/38) | Nothing in milestone 1 |
+| 11 | Optional synchronous groups of machines? | [#39](https://github.com/neocastro/ariadne/issues/39) | Nothing in milestone 1 |
+| 12 | Compile targets: native, WebAssembly, or both? | [#40](https://github.com/neocastro/ariadne/issues/40) | Nothing in milestone 1 |
+| 13 | Constrained decoding: grammar only, or types too? | [#41](https://github.com/neocastro/ariadne/issues/41) | Nothing in milestone 1 |
+| 14 | Patterns backlog: what comes after milestone 1, and in what order? | [#42](https://github.com/neocastro/ariadne/issues/42) | Nothing in milestone 1 |
+| 15 | Which standard-library machines exist beyond the core combinators? | [#43](https://github.com/neocastro/ariadne/issues/43) | Nothing in milestone 1 |
+| 18 | How are system-wide properties over many machines established? | [#46](https://github.com/neocastro/ariadne/issues/46) | Nothing in milestone 1 |
+| 19 | Which machine kinds, if any, unlock further unbounded guarantees? | [#47](https://github.com/neocastro/ariadne/issues/47) | Nothing in milestone 1 |
+| 6 | How do Lean proofs attach to Ariadne code? (deferred) | [#44](https://github.com/neocastro/ariadne/issues/44) | Nothing in milestone 1 |
+| 7 | Who writes the proofs that are not automatic? (deferred) | [#45](https://github.com/neocastro/ariadne/issues/45) | Nothing in milestone 1 |
 
 To measure rather than decide: how much real handler code falls inside the automatic idempotence proof (ADR-0015).
+
+## Note on Petri nets (corrected 2026-11-15)
+
+An earlier note here said that the header skeleton of replicated machines "is a Petri net", so safety for any number of instances is a coverability question and place invariants are candidate inductive invariants. An adversarial review found that overstated. The corrected statement:
+
+- A net built from machine headers is a sound over-approximation of the system. A safe verdict transfers to the real system; an unsafe verdict may be spurious and must be replayed concretely.
+- Headers alone do not determine branches that depend on a payload or on data, so for the rate limiter the header net proves nothing useful until transitions carry guards (ADR-0020, deferred).
+- A place invariant ranges over global counts of machines, not over one machine's state, so it is not directly the per-machine invariant of ADR-0017.
+- The rate limiter's property is better stated as a single-machine invariant with ghost state plus channel contracts (see issue #46).
+
+Details and the conditions for a possible `replicated` machine kind are in issue #47.
 
 ## Answered
 
