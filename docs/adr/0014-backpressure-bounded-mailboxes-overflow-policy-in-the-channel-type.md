@@ -58,3 +58,7 @@ Prior art this follows: Akka's control-aware mailboxes keep a second queue for c
 
 - How the `window k` bound on one-way channels is released: an explicit acceptance event, or credits passed into the step.
 - Whether capacity is a literal or may be an index refined elsewhere.
+
+## Amendments
+
+- ADR-0021: one-way channels are always `lossy`; `reject` is only available on channels with a protocol; the `window k` tag is removed.
