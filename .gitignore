@@ -1,0 +1,5 @@
+target/
+.lake/
+node_modules/
+*.olean
+.DS_Store
