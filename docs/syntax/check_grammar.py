@@ -28,6 +28,7 @@ MUST_FAIL = {
     "lowercase type name": "module m\ntype point = P(Int)",
     "wildcard transition to a state": "module m\nmachine M { state A event E transitions { A on _ -> A } }",
     "sends without a channel name": "module m\nmachine M { state A event E transitions { A on E -> A sends } }",
+    "removed window tag (ADR-0021)": "module m\ntype T = T(c: Chan[Int, cap 4, reject, window 2])",
     "transition without target": "module m\nmachine M { state A event E transitions { A on E -> } }",
 }
 

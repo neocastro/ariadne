@@ -2,7 +2,7 @@
 
 Status: the owner reviewed this draft on 2026-11-15 and chose to keep its overall syntax (ML and Rust flavoured, braces, `fn`), after seeing OCaml-style, Elm-style and clause-style alternatives. Lark stays as the grammar notation. The open problems at the end are not settled. Each row is a choice, the reason, and the alternative.
 
-The grammar is `grammar.lark`. `check_grammar.py` verifies it is LALR(1) with no conflicts, that the card's code blocks and every file in `examples/` parse, and that fifteen malformed inputs are rejected. Only the grammar is checked: no types, no exhaustiveness, no behaviour.
+The grammar is `grammar.lark`. `check_grammar.py` verifies it is LALR(1) with no conflicts, that the card's code blocks and every file in `examples/` parse, and that sixteen malformed inputs are rejected. Only the grammar is checked: no types, no exhaustiveness, no behaviour.
 
 ## Choices in the pure fragment
 

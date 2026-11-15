@@ -38,7 +38,6 @@ chan_tag: "cap" INT        -> tag_cap
         | "dedup" INT      -> tag_dedup
         | "drop_newest"    -> tag_drop_newest
         | "drop_oldest"    -> tag_drop_oldest
-        | "window" INT     -> tag_window
 
 // ---- functions and expressions --------------------------------------------
 
