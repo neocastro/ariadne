@@ -20,3 +20,4 @@ One file per decision. Accepted means decided; Proposed means recommended, await
 | [0014](0014-backpressure-bounded-mailboxes-overflow-policy-in-the-channel-type.md) | Backpressure: bounded mailboxes, overflow policy in the channel type | Accepted |
 | [0015](0015-idempotency-duplicates-in-the-channel-type-retries-only-where-safe.md) | Idempotency: duplicates in the channel type, retries only where safe | Accepted |
 | [0016](0016-expressions-are-pure-machines-are-the-only-effect.md) | Expressions are pure; machines are the only effect; channels are the capabilities | Accepted |
+| [0017](0017-specs-in-ariadne-invariants-by-default-exploration-as-fallback.md) | Specs are written in Ariadne; invariants by default, exploration as the fallback | Accepted |

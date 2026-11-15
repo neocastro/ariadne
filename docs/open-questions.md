@@ -4,7 +4,6 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 
 | # | Question | Needed before |
 | --- | --- | --- |
-| 3 | Is the spec layer part of the language or a separate one? | Model checking |
 | 4 | What does the runtime require from a durable log store? | Real durability |
 | 5 | How is a one-way channel's send window released: an acceptance event, or credits passed into the step? | One-way `reject` channels |
 | 6 | How do Lean proofs attach to Ariadne code, and who maintains the core-to-Lean export? | The Lean escape hatch being usable |
@@ -17,6 +16,10 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 | 13 | Constrained decoding: grammar only, or types too? | Tuning the agent loop |
 | 14 | Patterns backlog: sagas, deadline propagation, supervision, schema evolution, staleness and fencing, determinism boundaries | Each feature |
 | 15 | Machine combinators: which ones, and how are they typed? | The standard library |
+| 16 | Liveness: deadlines with explicit fault and scheduling budgets, or true "eventually" properties? | Liveness monitors |
+| 17 | Reference machines run as monitors, approved by a human: use them alongside "never" monitors? | Specs for whole systems |
+| 18 | System-wide properties over all replicas: quantified invariants, or composition from per-machine invariants and channel contracts? | Properties spanning many machines |
+| 19 | Recognized machine kinds for further unbounded guarantees: replicated, monotone, topology restrictions, deterministic pipeline regions | Each kind |
 
 To measure rather than decide: how much real handler code falls inside the automatic idempotence proof (ADR-0015).
 
@@ -24,6 +27,7 @@ To measure rather than decide: how much real handler code falls inside the autom
 
 - 1. Effect types and capabilities: expressions are pure, machines are the only effect, channels are the capabilities (ADR-0016).
 - 2. Multi-shot effect handlers: no longer arises (ADR-0016).
+- 3. Spec layer: specs are written in Ariadne; invariants by default, native exploration as the fallback (ADR-0017).
 - What success looks like for the first milestone: ADR-0011, ADR-0012.
 - How far dependent types go, and which proof options go into the language: ADR-0010.
 - Whether Mealy machines plus extensions are enough: ADR-0004.
