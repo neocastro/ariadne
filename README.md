@@ -4,7 +4,7 @@ A verifiable language for AI-written code.
 
 Agents write the code; humans review specs, machines and compiler-generated views; a small trusted checker, independent oracles and capabilities keep the code honest.
 
-- **Core:** a small, mechanized, pure, strict calculus with algebraic data types and effects. No GC: reference counting, no cyclic data, linear resources.
+- **Core:** a small, mechanized, pure, strict calculus with algebraic data types. Expressions never perform effects; machines are the only effect and channels are the capabilities. No GC: reference counting, no cyclic data, linear resources.
 - **Structure:** programs are composed state machines that share no mutable state and talk over session-typed channels.
 - **Proofs:** one index-refinement mechanism in a decidable fragment, checked by a pinned solver under a deterministic budget; Lean as the escape hatch (ADR-0010).
 - **Tooling:** deterministic simulation with fault injection, compiler-generated diagrams and trace replay, structured diagnostics for agents.

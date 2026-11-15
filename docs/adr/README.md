@@ -19,3 +19,4 @@ One file per decision. Accepted means decided; Proposed means recommended, await
 | [0013](0013-atomic-step-commit-the-outbox-is-the-runtime.md) | Atomic step commit: the outbox is the runtime | Accepted |
 | [0014](0014-backpressure-bounded-mailboxes-overflow-policy-in-the-channel-type.md) | Backpressure: bounded mailboxes, overflow policy in the channel type | Accepted |
 | [0015](0015-idempotency-duplicates-in-the-channel-type-retries-only-where-safe.md) | Idempotency: duplicates in the channel type, retries only where safe | Accepted |
+| [0016](0016-expressions-are-pure-machines-are-the-only-effect.md) | Expressions are pure; machines are the only effect; channels are the capabilities | Accepted |

@@ -23,3 +23,7 @@ The language desugars to a small, adopted core calculus (call-by-value lambda ca
 ## Consequences
 
 Adding features is slow by design; runtime checks for defined behavior unless proofs remove them; diagnostics must map from core back to source.
+
+## Amendments
+
+- ADR-0016: algebraic effects are dropped from the core. The core is call-by-value lambda calculus with algebraic data types and machines.
