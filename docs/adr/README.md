@@ -21,3 +21,4 @@ One file per decision. Accepted means decided; Proposed means recommended, await
 | [0015](0015-idempotency-duplicates-in-the-channel-type-retries-only-where-safe.md) | Idempotency: duplicates in the channel type, retries only where safe | Accepted |
 | [0016](0016-expressions-are-pure-machines-are-the-only-effect.md) | Expressions are pure; machines are the only effect; channels are the capabilities | Accepted |
 | [0017](0017-specs-in-ariadne-invariants-by-default-exploration-as-fallback.md) | Specs are written in Ariadne; invariants by default, exploration as the fallback | Accepted |
+| [0018](0018-machine-combinators-are-fused-and-lawful-no-loop.md) | Machine combinators are fused and lawful; `loop` is removed | Accepted |

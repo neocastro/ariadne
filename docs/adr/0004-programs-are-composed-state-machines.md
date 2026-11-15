@@ -34,4 +34,7 @@ A pure function is a one-state machine. Composition is the only structuring mech
 
 Visualization and trace replay come from the compiler; spec and program share a shape; compilers and numerical code live mostly in pure functions with thin machine layers.
 
+## Amendments
+
 - ADR-0017: spec machines take an explicit finite `Choice` input instead of returning sets.
+- ADR-0018: `loop` is removed, `lift` takes a function to a list, and combinators are fused into one machine with one commit.

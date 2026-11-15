@@ -15,7 +15,7 @@ Questions not yet settled by an ADR, in the order we plan to answer them. Each a
 | 12 | Compile targets: native, WebAssembly, or both? | The optimizing compiler |
 | 13 | Constrained decoding: grammar only, or types too? | Tuning the agent loop |
 | 14 | Patterns backlog: sagas, deadline propagation, supervision, schema evolution, staleness and fencing, determinism boundaries | Each feature |
-| 15 | Machine combinators: which ones, and how are they typed? | The standard library |
+| 15 | Standard-library machines beyond `lift`, `>>>` and `|||` (retry, scatter-gather, routing): which ones, and how are they typed? The core combinators and their laws are settled by ADR-0018. | The standard library |
 | 18 | System-wide properties over all replicas: quantified invariants, or composition from per-machine invariants and channel contracts? | Properties spanning many machines |
 | 19 | Recognized machine kinds for further unbounded guarantees: replicated, monotone, topology restrictions, deterministic pipeline regions | Each kind |
 
