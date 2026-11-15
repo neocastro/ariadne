@@ -75,6 +75,21 @@ inv ∷ s → Bool
 - **Liveness is written as deadlines.** A liveness property is a deadline over logical time ("answered within T"), which makes it a safety property that monitors check in exploration, in simulation and in production. A deadline holds under declared assumptions: a fault budget (for example, at most k consecutive drops on a channel) and a scheduling bound (every ready machine runs within k steps). True "eventually" properties under fairness are deferred, and only for the finite header and protocol models checked by the deferred external model checker.
 - **Reference machines are used alongside "never" monitors.** A reference machine is a small machine describing a system's intended behaviour at its boundary. It runs as a monitor: it observes boundary events and tracks which abstract states remain possible; none remaining is a violation. It is written or approved by a human and is read-only to the agent. It is optional per system, not required.
 
+- **Refinement against a reference machine is a solver-checked obligation.** Monitoring a reference machine gives a bounded result. To get an unbounded one, the agent supplies a simulation relation between the two machines' states and a witness for the spec's choice:
+
+```
+R    ∷ s → t → Bool                 -- implementation state, spec state
+pick ∷ s → t → i → Choice           -- which choice the spec takes
+
+R s₀ t₀
+∀ s t i.  R s t ∧ valid i  ⇒
+    let (s', os) = step s i
+        (t', ps) = specStep t i (pick s t i)
+    in  os = ps ∧ R s' t'
+```
+
+  Because `Choice` is finite and `pick` is explicit, the obligation has no quantifier alternation: it is an inductive invariant over the pair of states, and uses the same budgeted solver. A machine with a discharged `R` is shown as "refines, unbounded" on the assurance map; one that is only monitored is shown as such. Forward simulation is not complete, so some specs will need extra ghost state in the implementation's relation. Two machines are behaviourally equivalent when a simulation holds in both directions (used by ADR-0018).
+
 ## Open questions
 
 - Quantified invariants versus compositional reasoning for system-wide properties.
