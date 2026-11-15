@@ -46,10 +46,10 @@ fn nudge(p: Point, by: Int) -> Point {
 
 A machine is the only thing that has effects. Its **header** (config, states, events, timers, transitions, invariant) is what humans review. Its **bodies** (`init`, `step`) are what you write.
 
-- `transitions` lists every allowed `State on Event -> Target | Target`. A pair that should be ignored is declared `-> drop`. Every state and event pair must appear.
+- `transitions` lists every allowed `State on Event -> Target | Target`, followed by what the transition may emit: `sends` channel fields, `starts` timers. A pair that should be ignored is declared `-> drop`; `State on _ -> drop` drops every event the state has no row for. Every state and event pair must be covered.
 - `step(state, event, env)` is a pure function. It matches on `(state, event)` with one or more arms for every pair that is not `drop`, and none for pairs that are.
 - Every arm, and `init`, ends in `next <State> emit [<outputs>]`. Use `emit []` for no outputs.
-- Outputs: `send(channel, message)` and `start_timer(TimerName, duration)`. Nothing else reaches the outside.
+- Outputs: `send(channel, message)` and `start_timer(TimerName, duration)`, and only those the transition's row declares. Nothing else reaches the outside.
 - `env.now` is the logical time of this event. `env.inbox(Event)` is a channel that delivers to this machine as `Event`.
 - A `waiting` state must have a transition on a timer.
 - `invariant(s)` must hold in every reachable state.
@@ -69,10 +69,10 @@ machine Limiter {
   timer WindowEnd
 
   transitions {
-    Open on Acquire -> Open | Exhausted
-    Open on WindowEnd -> Open
-    Exhausted on Acquire -> Exhausted
-    Exhausted on WindowEnd -> Open
+    Open on Acquire -> Open | Exhausted sends reply
+    Open on WindowEnd -> Open starts WindowEnd
+    Exhausted on Acquire -> Exhausted sends reply
+    Exhausted on WindowEnd -> Open starts WindowEnd
   }
 
   invariant(s) {

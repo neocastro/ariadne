@@ -18,10 +18,10 @@ machine Limiter {
   timer WindowEnd
 
   transitions {
-    Open on Acquire -> Open | Exhausted
-    Open on WindowEnd -> Open
-    Exhausted on Acquire -> Exhausted
-    Exhausted on WindowEnd -> Open
+    Open on Acquire -> Open | Exhausted sends reply
+    Open on WindowEnd -> Open starts WindowEnd
+    Exhausted on Acquire -> Exhausted sends reply
+    Exhausted on WindowEnd -> Open starts WindowEnd
   }
 
   invariant(s) {
@@ -64,7 +64,7 @@ machine FakeDb {
   event Get(key: String, reply: Chan[Lookup, cap 1, lossy, drop_newest])
 
   transitions {
-    Ready on Get -> Ready
+    Ready on Get -> Ready sends reply
   }
 
   invariant(s) {
@@ -108,18 +108,15 @@ machine Request {
   timer GaveUp
 
   transitions {
-    AwaitLimiter on Decided -> AwaitDb | Done
-    AwaitLimiter on Rejected -> Done
-    AwaitLimiter on GaveUp -> Done
-    AwaitLimiter on Looked -> drop
-    AwaitDb on Looked -> Done
-    AwaitDb on Rejected -> Done
-    AwaitDb on GaveUp -> Done
-    AwaitDb on Decided -> drop
-    Done on Decided -> drop
-    Done on Looked -> drop
-    Done on Rejected -> drop
-    Done on GaveUp -> drop
+    AwaitLimiter on Decided -> AwaitDb | Done sends db, client
+    AwaitLimiter on Rejected -> Done sends client
+    AwaitLimiter on GaveUp -> Done sends client
+    AwaitLimiter on _ -> drop
+    AwaitDb on Looked -> Done sends client
+    AwaitDb on Rejected -> Done sends client
+    AwaitDb on GaveUp -> Done sends client
+    AwaitDb on _ -> drop
+    Done on _ -> drop
   }
 
   invariant(s) {
@@ -170,8 +167,7 @@ monitor AtMostCapacityPerWindow {
   transitions {
     Counting on Request::Decided -> Counting | Violated
     Counting on Limiter::WindowEnd -> Counting
-    Violated on Request::Decided -> drop
-    Violated on Limiter::WindowEnd -> drop
+    Violated on _ -> drop
   }
 
   init(cfg, env) {

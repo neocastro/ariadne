@@ -26,6 +26,8 @@ MUST_FAIL = {
     "chained comparison": "module m\nfn f(a: Int) -> Bool { 0 < a < 10 }",
     "reserved word as a variable": "module m\nfn f(next: Int) -> Int { next }",
     "lowercase type name": "module m\ntype point = P(Int)",
+    "wildcard transition to a state": "module m\nmachine M { state A event E transitions { A on _ -> A } }",
+    "sends without a channel name": "module m\nmachine M { state A event E transitions { A on E -> A sends } }",
     "transition without target": "module m\nmachine M { state A event E transitions { A on E -> } }",
 }
 

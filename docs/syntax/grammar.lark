@@ -114,8 +114,12 @@ timer_decl: "timer" UIDENT                                 // PROVISIONAL, ticke
 observes_decl: "observes" qname ("," qname)*               // PROVISIONAL, ticket 10
 
 transitions_decl: "transitions" "{" transition* "}"
-transition: UIDENT "on" qname "->" target ("|" target)*
+// ADR-0020: names, declared outputs, and a wildcard that can only drop.
+transition: UIDENT "on" qname "->" target ("|" target)* transition_out*   -> transition
+          | UIDENT "on" "_" "->" "drop"                                   -> transition_wildcard
 target: UIDENT -> target_state | "drop" -> target_drop
+transition_out: "sends" LIDENT ("," LIDENT)*     -> out_sends
+              | "starts" UIDENT ("," UIDENT)*    -> out_starts
 
 invariant_decl: "invariant" "(" LIDENT ")" block           // PROVISIONAL, ticket 29
 init_decl: "init" "(" LIDENT "," LIDENT ")" block

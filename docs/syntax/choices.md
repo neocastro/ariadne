@@ -1,8 +1,8 @@
 # Syntax choices (draft for ticket #1)
 
-Status: a sketch written while the owner was away. Nothing here is decided. Each row is a choice made in the draft, the reason, and the alternative, so it can be accepted or reversed.
+Status: the owner reviewed this draft on 2026-11-15 and chose to keep its overall syntax (ML and Rust flavoured, braces, `fn`), after seeing OCaml-style, Elm-style and clause-style alternatives. Lark stays as the grammar notation. The open problems at the end are not settled. Each row is a choice, the reason, and the alternative.
 
-The grammar is `grammar.lark`. `check_grammar.py` verifies it is LALR(1) with no conflicts, that the card's code blocks and every file in `examples/` parse, and that thirteen malformed inputs are rejected. Only the grammar is checked: no types, no exhaustiveness, no behaviour.
+The grammar is `grammar.lark`. `check_grammar.py` verifies it is LALR(1) with no conflicts, that the card's code blocks and every file in `examples/` parse, and that fifteen malformed inputs are rejected. Only the grammar is checked: no types, no exhaustiveness, no behaviour.
 
 ## Choices in the pure fragment
 
@@ -28,6 +28,8 @@ The grammar is `grammar.lark`. `check_grammar.py` verifies it is LALR(1) with no
 | --- | --- | --- | --- |
 | 14 | `step(state, event, env)` is an ordinary block that matches on the pair `(state, event)` | Reuses the expression language; no separate handler syntax to learn or to specify | `on State, Event { ... }` handler blocks |
 | 15 | Transitions are declared in the header; a `drop` pair is declared there and has no arm | The header is the human-reviewed part (ADR-0012); a dropped pair is a reviewable decision, not code | `drop` written as an arm |
+| 15a | A row may declare its outputs: `sends` channel fields and `starts` timers (ADR-0020) | An arm may emit only what its row declares, a syntactic check | Outputs unconstrained by the header |
+| 15b | `State on _ -> drop` drops every event with no explicit row for that state; a wildcard can only drop (ADR-0020) | Most rows of a real header are drops; the expansion is finite and always shown | Every drop row written out |
 | 16 | Every arm ends in `next State(...) emit [...]`, and `emit` is mandatory even when empty | One shape for every step result; outputs can never be forgotten silently | Optional `emit` |
 | 17 | `init(cfg, env)` uses the same `next ... emit` form | The first state and first outputs are produced the same way as all later ones | A separate initial-state declaration |
 | 18 | Declaration keywords (`state`, `event`, `config`, `on`, ...) are contextual; only `fn let if else match next emit Chan` and `_` are reserved | `state` and `event` are the natural parameter names for `step`; reserving them would trip models constantly | Reserve everything (simpler lexer) |
@@ -49,5 +51,5 @@ The grammar is `grammar.lark`. `check_grammar.py` verifies it is LALR(1) with no
 4. **Rebuilding a state to change one field is verbose.** Every `Open(...)` repeats `capacity` and `window`. Choice 9 is the cause.
 5. **The monitor in the example is subtly wrong.** It counts admissions when the requester receives them, so an admission granted late in one window can be counted in the next. The monitor should observe what the limiter sends. What a monitor may observe (deliveries, sends, or both) is a ticket 10 decision.
 6. **There is no wiring syntax.** Nothing yet says how the system is assembled: which machines are spawned first and how channels are created and handed out.
-7. **Exhaustiveness over pairs** is defined against the `transitions` block, not by the plain match rule, because dropped pairs have no arm. The type checker (ticket 04, ticket 06) needs this as a special rule.
+7. **Exhaustiveness over pairs** is defined against the expanded `transitions` table, not by the plain match rule, because dropped pairs have no arm. The type checker (ticket 04, ticket 06) needs this as a special rule.
 8. **Whether models write this reliably** is exactly what the spike in ticket 03 measures. The riskiest items for that are choices 6, 7 and 16.
